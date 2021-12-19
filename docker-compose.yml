@@ -9,15 +9,18 @@ services:
       --port 13000
       --eth1-endpoints $XDAI_RPC_URL
       --datadir /home/.eth2/beaconchaindata
-      --http-address 127.0.0.1
+      --http-address 0.0.0.0
       --http
       --enr-address $PUBLIC_IP
       --enr-udp-port 12000
+      --trusted-peers $TRUSTED_PEERS
       --debug-level $LOG_LEVEL
-    network_mode: host
+    ports:
+      - '12000:12000/udp'
+      - '13000:13000'
     volumes:
       - ./config:/root/sbc/config
-      - ./node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
     logging:
       driver: "json-file"
       options:
@@ -33,16 +36,19 @@ services:
       --eth1-endpoints $XDAI_RPC_URL
       --datadir /home/.eth2/beaconchaindata
       --slasher-dir /home/.eth2/slasherdata
-      --http-address 127.0.0.1
+      --http-address 0.0.0.0
       --http
+      --trusted-peers $TRUSTED_PEERS
       --debug-level $LOG_LEVEL
       --slasher
       --slasher-max-db-size 32
-    network_mode: host
+    ports:
+      - '12000:12000/udp'
+      - '13000:13000'
     volumes:
       - ./config:/root/sbc/config
-      - ./node_db:/home/.eth2/beaconchaindata
-      - ./slasher_db:/home/.eth2/slasherdata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/slasher_db:/home/.eth2/slasherdata
     logging:
       driver: "json-file"
       options:
@@ -58,17 +64,17 @@ services:
       --eth1-endpoints $XDAI_RPC_URL
       --datadir /home/.eth2/beaconchaindata
       --slasher-dir /home/.eth2/slasherdata
-      --http-address 127.0.0.1
+      --http-address 0.0.0.0
       --http
+      --trusted-peers $TRUSTED_PEERS
       --debug-level $LOG_LEVEL
       --slasher
       --slasher-max-db-size 32
       --slasher-broadcast
-    network_mode: host
     volumes:
       - ./config:/root/sbc/config
-      - ./node_db:/home/.eth2/beaconchaindata
-      - ./slasher_db:/home/.eth2/slasherdata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/slasher_db:/home/.eth2/slasherdata
     logging:
       driver: "json-file"
       options:
@@ -89,12 +95,13 @@ services:
       - ./validators:/root/sbc/validators
   validator:
     image: ghcr.io/gnosischain/gbc-lighthouse:v2.0.1-gbc
+    depends_on:
+      - node
     command: |
       lighthouse validator_client
       --testnet-dir /root/sbc/config
       --validators-dir /root/sbc/validators
-      --beacon-nodes http://localhost:5052
-    network_mode: host
+      --beacon-nodes http://node:5052
     volumes:
       - ./config:/root/sbc/config
       - ./validators:/root/sbc/validators
