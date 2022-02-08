@@ -16,6 +16,7 @@ services:
       --enr-address $PUBLIC_IP
       --enr-udp-port 12000
       --target-peers $TARGET_PEERS
+      --trusted-peers $TRUSTED_PEERS
       --metrics
       --metrics-address 0.0.0.0
       --metrics-allow-origin *
@@ -24,10 +25,12 @@ services:
       - '12000:12000/udp'
       - '13000:13000'
     volumes:
-      - ./node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
     logging:
-      driver: syslog
-      options: { tag: '{{.Name}}/{{.ID}}' }
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"
   node-private-slasher:
     image: sigp/lighthouse:v2.1.2-modern
     hostname: node
@@ -43,6 +46,7 @@ services:
       --http-address 0.0.0.0
       --http
       --target-peers $TARGET_PEERS
+      --trusted-peers $TRUSTED_PEERS
       --metrics
       --metrics-address 0.0.0.0
       --metrics-allow-origin *
@@ -53,11 +57,13 @@ services:
       - '12000:12000/udp'
       - '13000:13000'
     volumes:
-      - ./node_db:/home/.eth2/beaconchaindata
-      - ./slasher_db:/home/.eth2/slasherdata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/slasher_db:/home/.eth2/slasherdata
     logging:
-      driver: syslog
-      options: { tag: '{{.Name}}/{{.ID}}' }
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"
   node-public-slasher:
     image: sigp/lighthouse:v2.1.2-modern
     hostname: node
@@ -73,6 +79,7 @@ services:
       --http-address 0.0.0.0
       --http
       --target-peers $TARGET_PEERS
+      --trusted-peers $TRUSTED_PEERS
       --metrics
       --metrics-address 0.0.0.0
       --metrics-allow-origin *
@@ -84,11 +91,13 @@ services:
       - '12000:12000/udp'
       - '13000:13000'
     volumes:
-      - ./node_db:/home/.eth2/beaconchaindata
-      - ./slasher_db:/home/.eth2/slasherdata
+      - /mnt/gbc-data/node_db:/home/.eth2/beaconchaindata
+      - /mnt/gbc-data/slasher_db:/home/.eth2/slasherdata
     logging:
-      driver: syslog
-      options: { tag: '{{.Name}}/{{.ID}}' }
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "1"
   validator-import:
     image: sigp/lighthouse:v2.1.2-modern
     command: |
