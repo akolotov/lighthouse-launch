@@ -4,6 +4,8 @@ services:
     image: sigp/lighthouse:v2.2.0-modern
     hostname: node
     restart: always
+    # useful options
+    # --eth1-purge-cache 
     command: |
       lighthouse beacon_node
       --network gnosis
@@ -11,6 +13,7 @@ services:
       --discovery-port 12000
       --port 13000
       --eth1-endpoints $XDAI_RPC_URL
+      --eth1-blocks-per-log-query 256
       --datadir /home/.eth2/beaconchaindata
       --http-address 0.0.0.0
       --http
@@ -119,10 +122,11 @@ services:
     restart: always
     depends_on:
       - node
+    # useful options
+    # --enable-doppelganger-protection
     command: |
       lighthouse validator_client
       --network gnosis
-      --enable-doppelganger-protection
       --validators-dir /root/sbc/validators
       --beacon-nodes http://node:5052
       --graffiti-file /root/sbc/config/graffiti.yml
@@ -139,7 +143,7 @@ services:
         max-size: "100m"
         max-file: "1"
   validator-import-slashing-protection:
-    image: sigp/lighthouse:v2.1.5-modern
+    image: sigp/lighthouse:v2.2.0-modern
     command: |
       lighthouse account validator slashing-protection import
       --network gnosis
@@ -154,7 +158,7 @@ services:
         max-size: "100m"
         max-file: "1"
   validator-export-slashing-protection:
-    image: sigp/lighthouse:v2.1.5-modern
+    image: sigp/lighthouse:v2.2.0-modern
     command: |
       lighthouse account validator slashing-protection export
       --network gnosis
